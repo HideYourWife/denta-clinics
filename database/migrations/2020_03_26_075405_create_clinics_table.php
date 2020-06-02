@@ -24,7 +24,7 @@ class CreateClinicsTable extends Migration
             $table->string('address')->nullable();
             $table->string('distance')->nullable();
             $table->string('email')->nullable();
-            $table->float('rating', 1, 1)->nullable();
+            $table->float('rating')->nullable();
             $table->text('preview_text')->nullable();
             $table->string('preview_picture')->nullable();
             $table->string('official_name')->nullable();

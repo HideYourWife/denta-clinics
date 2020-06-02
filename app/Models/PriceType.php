@@ -6,5 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class PriceType extends Model
 {
-    //
+    protected $fillable = [
+        'id',
+        'name',
+        'sort',
+        'created_at',
+        'updated_at',
+    ];
+
+    public function clinics()
+    {
+        return $this->hasMany('App\Models\Clinic');
+    }
 }

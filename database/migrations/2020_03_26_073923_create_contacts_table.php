@@ -22,10 +22,13 @@ class CreateContactsTable extends Migration
             $table->string('phone_1')->nullable();
             $table->string('phone_2')->nullable();
             $table->string('phone_3')->nullable();
-            $table->binary('ico')->nullable();
-            $table->binary('address')->nullable();
-            $table->binary('work_time')->nullable();
-            $table->binary('map_coordinates')->nullable();
+            $table->string('ico')->nullable();
+            $table->string('address')->nullable();
+            $table->string('work_time')->nullable();
+            $table->string('map_coordinates')->nullable();
+            $table->string('reviews')->nullable();
+            $table->string('clinics')->nullable();
+            $table->string('visitors')->nullable();
         });
     }
 

@@ -16,6 +16,7 @@ class CreateClinicServicesTable extends Migration
         Schema::create('clinic_services', function (Blueprint $table) {
             $table->foreignId('clinic_id')->constrained();
             $table->foreignId('service_id')->constrained();
+            $table->unsignedInteger('price')->nullable();
             $table->primary(['clinic_id','service_id']);
         });
     }
