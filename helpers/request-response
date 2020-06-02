@@ -1,0 +1,44 @@
+//------------------------------------------------------------------
+//                  Request $request
+//------------------------------------------------------------------
+
+$request->all();            //get all params
+$request->paramName;        //get param
+$request->path();           //get url path
+$request->url();            //get full url path without get params
+$request->fullUrl();        //get full url with get params like (urlPath/?name=John)
+$request->is('pathName/*'); //return boolean, check path correspond to  url pathName
+$request->method();         // return string request method (get, post)
+$request->isMethod('get');  // return boolean
+$request->flash();          // save request data to session (didn't work without session start)
+// Session:all() - in view return session data
+// {{ old('dataName') }} - in view for show data dataName from session
+$request->root()            // return domen name with http (http://laravel.loc)
+$request->exists('dataName')// return boolean, determinate if request has dataName from input
+$request->query('dataName') // return dataName param from get request
+$request->query()           // return all data params from get request
+$request->header()          // return array with header data
+$request->segments()        // return array of segmented url string (http://laravel.loc/comments/page_02 -> array('comments', 'page_02'))
+$request->old()             // retrieve an old input item
+
+
+//-----------------------------------------------------------------
+//                  Response $response
+//-----------------------------------------------------------------
+
+return new Response($content = '', $status = 200, $headers = array())  // return response in controller
+
+$view = view('viewName')->withTitle('some title name')->render();   // return rendered view
+return new Response($view);  // return response with rendered view
+
+return new Response($view)->header('Content-Type', 'newType')->header...  // we can send custom header data
+return response($view)->withHeaders(['headerOne'=>'data', 'headerTwo'=>'data',...])
+return response($view)->header(...)     // function helper some as new Response
+
+return response()->download('filePath', 'fileName')  // return file to user  ->download('public/robots.txt')
+
+return redirect('/contacts')->withInput();   // redirect to specific url // withInput save data from inputs to session
+return back();   // redirect back to initial url
+return redirect()->route('routeName')  // redirect to route
+return redirect()->action('controllerName@methodName')  // redirect to controller method
+return redirect()->with('param1', 'data');  // redirect and put in session some params

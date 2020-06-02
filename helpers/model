@@ -1,0 +1,118 @@
+//------------------------------------------------------------------
+MODELS
+//------------------------------------------------------------------
+php artisan make:model User    //Должна совпадать с таблицей в БД в единственном числе (table Users -> model User)
+php artisan make:model Test -m  // make model and create migration for it
+
+
+class Article extends Model
+{
+    use SoftDeletes;                        // for soft deletes
+    protected $dates = ['deleted_at'];      // for soft deletes
+    ----
+    protected $table = 'tableName';     // optional (need if table name not corresponded to class name in multiple variant (class User -> $table='Users')
+    protected $primaryKey = 'someName';       // optional (needed if auto increment column name isn't 'id')
+    public $timestamps = FALSE;          // optional (needed if we dn't need timestamps fields)
+
+    protected $fillable = ['name', 'text',..]  // variable for columns which will be accept to create in Article::create([...])
+
+    public function funcName() {                // функция для доступа к полям связанного эллемента через модель App\ModelName
+        return $this->hasOne('App\ModelName')   // связанная модель должна содержать поле `foreign key` с началом имени по имени
+    }                                           // связывающей модели с id на конце, в данно случае у таблице описанной
+                                                // в моModelName должно быть поле article_id
+                                                // или можно написать $this->hasOne('App\ModelName', 'article_id', 'id')
+                                                // в связанной модели для связи с этой моделью нужно прписать схожий метод
+                                                // $this->belongsTo('App\Article')
+                                                // для связи OneToMany используем $this->hasMany('App\ModelName')  возвратит коллекцию моделей (связанных записей)
+                                                // для связи ManyToMany не забываем создать связующию таблицу
+                                                // в моделе прописываем $this->belongsToMany('App\ModelName', 'имя_связующей_таблицы', 'article_id', 'users_id')
+
+    public function getNameAttribute($value) {  // метод читатель, вызывается когда мы обращаемся к свойству модели типо $modelObject->name;
+        //we can do something with $value
+        return $value;
+    }
+
+    public function setNameAttribute($value) {  // метод писатель, вызывается когда пытаемся изменить значения свойства типо:
+        //do something                          // $modelObject->name = 'something'
+        $this->attribute['name'] = $value;
+
+    }
+}
+
+$users = Article::where('id', '>', 3)->orderBy('name')->take(2)->get(); // we can form queries in this mode
+static::chunk(2, function(){})  //
+static::find(1)   // search element with id = 1
+static::find([1,3,5])   // search array of elements
+
+
+$article = new Article;
+$article->name = 'Bla Bla';
+$article->text = 'some text';
+$article->save();
+
+---------
+
+$article = Article::find(4);
+$article->name = 'Jo jo';
+$article->save();
+---------
+$article = Article::find(4);
+$article->delete();
+------------
+Article::destroy(4)      // delete element
+Article::destroy([4,7])      // delete elements
+----------
+$articles = Article::withTrashed()->restore();  // select * and restore soft deleted elements
+$articles = Article::onlyTrashed()->restore();  // select soft deleted elements and restore
+$articles->forceDelete();      // totaly delete element when soft delete mode is active
+---------
+Article::create([
+                'name'=>'John Doe',
+                'text'=>'tro lo lo',
+                .....
+                ]);
+
+---------
+
+$article = Article::firstOrCreate([
+                        'name' => 'John Kuvalda',
+                        'text' => 'Some text',
+                        ])          // create a new element if dn't find element with some value as in first line ('name' in this case)
+                                    // and save in DB
+                                    // return model object of created or finded element
+
+-----
+$article = Article::firstOrNew([...])   // like firstOrCreate but without save in DB
+-----
+
+$some = $article->funcName;  // возвращяет модель с данными связанной таблицы, funcName описана в вызывающей модели
+$some = $article->funcName()->where('id', 2)->first();  // если связь OneToMany funcName() возвращяет коллекцию моделей связанной
+                                                        // таблицы без выборки данных, funcName описана в вызывающей модели
+                                                        // потом с помощтью коструктора запросов фотмируются условия и выполняется запрос
+
+---------------------
+Add data to db
+-----------------------
+// create new article element with foreign key
+$user = User::find(1);
+
+$article = new Article(['name'=>'someName'...]);    // new model object
+$user->articles()->save($article);                  // articles()  method in $user: $this->belongsToMany('App\ModelName',...)
+
+//or
+
+$user = User::find(1);
+$user->articles()->create([.....]);
+-------
+
+$user->articles()->saveMany($article, $article2,...);  //multiple add to DB
+-----
+
+$user->articles()->where('id', 24)->update(['name'=>'jo',...]);     //  update element with id=24
+----
+
+$country = Country::find(1);
+$user = User::find(2);
+$country->user()->associate($user);   // изменяет связь, связывая эллемент с новым эллементом
+$country->save();
+---------

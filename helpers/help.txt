@@ -1,0 +1,159 @@
+//----------------------------
+//          helpers
+//------------------------------
+
+dd()  // dump() and die()
+dump()
+
+//------------------------------
+//      for clear chache
+//------------------------------
+
+php artisan cache:clear
+php artisan config:clear
+php artisan config:cache
+php artisan route:clear
+php artisan view:clear
+
+php artisan key:gen
+
+//---------------------------------
+composer require lavary/laravel-menu            // for menu
+composer require barryvdh/laravel-ide-helper    // ide helper
+composer require fomvasss/laravel-meta-tags     // for meta-tags
+composer require unisharp/laravel-ckeditor      // texarea widget, like mini word, //file browser kcfinder for this editor
+composer require arrilot/laravel-widgets        // widgets
+//------------------------------
+//      Make Controllers
+//------------------------------
+
+
+php artisan make:Controller ControllerName
+php artisan make:Controller Admin/ControllerName  // create controller in concrete namespace
+
+php artisan make:middleware MiddlewareName  // create middleware
+
+php artisan route:list // show graphical route list
+
+
+//----------------------------------------------------------------------------------
+//      DB queries - returned array
+//----------------------------------------------------------------------------------
+
+
+DB::select("SELECT * FROM `tableName` WHERE id = ?", ['2']);  // return array
+DB::select('select * from users where id=:id',['id'=>1]);
+DB::insert("INSERT INTO `tableName` (`name`, `text`) VALUES (?,?)", ['Jhon', 'it's my life]);
+DB::update("UPDATE `tableName` SET `name` = ? WHERE `id` = ?", ['test2', 1]);
+DB::delete("DELETE FROM `tableNamme` WHERE `id` = ?", [3]);
+
+$result = DB::connection()->getPdo()->lastInsertId();   // return id of last inserted row
+
+DB::statement('drop table users');
+
+//query builder
+
+DB::table('tableName')->get();  // select * from tableName
+DB::table('tableName')->value('name'); // select 'name' from 'tableName' limit 1
+DB::table('tableName')->chunk(10, function(){...})->value('name'); // select 'name' from 'tableName' limit 10 and do something with every request
+DB::table('tableName')->pluck('name')  // select 'name' from 'tableName'
+DB::table('tableName')->count()  // return element counts
+DB::table('tableName')->max('id')  // return max
+DB::table('tableName')->select($columns = ['*'])     //!!! return query object (non executed)
+DB::table('tableName')->select($columns = ['*'])->get()  // select ['*'] from 'tableName' (->get() - execute query)
+DB::table('tableName')->distinct()->select('name')->get()  // select data from column name where name unique
+
+$query = DB::table('tableName')->select('name');     // return query object
+$arr = $query->addSelect('text AS fulltext')->get(); // add some columns to query object and execute
+
+
+DB::table('users')->where('name','John')->first();  // return first finded element
+DB::table('users')->where('name','=','John')->value('email');  // return only value
+DB::table('users')->where('id', '>', '10')->where('name', 'like', 'test%')->first();  // logical 'and' for where
+DB::table('users')->where('id', '>', '10')->where('name', 'like', 'test%', 'or')->get();  // logical 'or' for where
+DB::table('users')->where([['id', '>', '10'], ['name', 'like', 'test%', 'or']])->get();  // we can transmit many logical arguments in array
+DB::table('users')->where('id', '>', '10')->orWhere('name', 'like', 'test%')->get();  // we can use orWhere() instead of where(...,'or')
+DB::table('users')->whereBetween('id', [1,5])->get();  // return elements from 1 to 5
+DB::table('users')->whereNotBetween('id', [1,5])->get();  //
+DB::table('users')->whereIn('id', [1,5,10,8])->get();  // return elements 1,5,10,8
+DB::table('users')->whereNotIn('id', [1,5,10,8])->get();  //
+
+DB::table('tableName')->take(4)->get();  // select * from tableName (limit 4)
+
+DB::insert("INSERT INTO 'tableName' VALUES (?,?,?)", ['data1', 'data2', 'data3']);
+DB::table('tableName')->insert(array(array1(), array2(),...))  //where array1..n data like ('name'=>'john', 'email'=>'sdf'...)
+$res = DB::table('tableName')->insertGetId(array(array1(), array2(),...))  // return id of inserted element
+
+DB::table('users')->where('name', 'John')->update(['email'=>'new_email', 'lastName'=>'Kuvalda']);  // update element; return count of modified elements
+DB::table('users')->where('name', 'John')->delete();   // delete elements; return count of deleted elements
+
+$user = DB::table('users')->pluck('name', 'id')  // return only column 'name' where array [key] will be ['id']
+
+$user = DB::table('users')->increment('name', 5)  // increment data from field(s) by 5
+$user = DB::table('users')->decrement('name', 5)  // decrement data from field(s) by 5
+
+//JOINS
+LEFT JOIN 'tableName' ON user.id = tableName.id
+
+$users = DB::table('users')
+        ->leftJoin('tableName', 'user.id', '=', 'tableName.id')   // creatin join
+        ->join(......)
+        ->select('users.*', 'tableName.name', 'tableName.email')  // selected columns
+        ->get();
+
+//---------------------
+
+$table->foreign('task_id')->references('id')->on('tasks');
+alter table users add foreign key (city_id) references cities (id) on delete cascade on update cascade;  // sql query
+
+//----------------------------
+//----------------------------
+
+create table categories (
+    id int not null auto_increment,
+    title varchar(255) not null,
+    alias varchar(255) not null unique,
+    parent_id int default null,
+    keywords varchar(255),
+    description varchar(255),
+    created_at timestamp,
+    updated_at timestamp,
+    deleted_at timestamp,
+    primary key (id),
+    foreign key (parent_id)
+    references categories (id)
+    on delete cascade
+    on update cascade);
+
+//-----------------------------
+/* Double foreign key */
+//-----------------------------
+
+create table related_products (
+    product_id bigint unsigned not null,
+    related_id bigint unsigned not null,
+    foreign key (product_id)
+    references products (id)
+    on delete cascade
+    on update cascade,
+    foreign key (related_id)
+    references products (id)
+    on delete cascade
+    on update cascade,
+    primary key (product_id, related_id));
+
+//-----------------------------
+//-----------------------------
+
+create table attribute_values (
+    id bigint unsigned not null,
+    value varchar(255) not null unique key,
+    attr_group_id bigint unsigned not null,
+    foreign key (attr_group_id)
+    references attribute_groups (id)
+    on delete cascade
+    on update cascade,
+    primary key (id),
+    key attr_group_id (attr_group_id));
+
+
