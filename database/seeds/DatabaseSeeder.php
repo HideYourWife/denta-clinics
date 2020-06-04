@@ -3,6 +3,7 @@
 use database\factories\NewsFactory;
 use Illuminate\Database\Seeder;
 
+
 class DatabaseSeeder extends Seeder
 {
     /**
