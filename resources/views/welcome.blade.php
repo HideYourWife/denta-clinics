@@ -68,12 +68,32 @@
             @if (Route::has('login'))
                 <div class="top-right links">
                     @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
+                        @if(Auth::user()->isUser())
+                            <a class="bold-link" href="{{ url('/') }}">Главная</a>
+                        @elseif(Auth::user()->isVisitor())
+                            <a class="bold-link" href="{{ url('/') }}">Главная</a>
+                        @elseif(Auth::user()->isAdministrator())
+                            <a class="bold-link" href="{{ url('/admin/index') }}" style="cursor: pointer;">Панель Администратора</a>
+                            <a class="bold-link" href="{{ url('/') }}">Главная</a>
+                        @endif
 
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}">Register</a>
+
+                        <a class="dropdown-item bold-link" href="{{ route('logout') }}"
+                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Выйти</a>
+
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    @else
+
+                        <a class="bold-link" href="{{ route('login') }}">Войти</a>
+
+
+                        @if(Route::has('register'))
+
+                            <a class="bold-link" href="{{ route('register') }}">Регистрация</a>
+
                         @endif
                     @endauth
                 </div>
@@ -84,16 +104,6 @@
                     Laravel
                 </div>
 
-                <div class="links">
-                    <a href="https://laravel.com/docs">Docs</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://blog.laravel.com">Blog</a>
-                    <a href="https://nova.laravel.com">Nova</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://vapor.laravel.com">Vapor</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
             </div>
         </div>
     </body>

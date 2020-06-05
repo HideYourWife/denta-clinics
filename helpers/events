@@ -1,9 +1,0 @@
-app/events/EventServiceProvider.php         // register events in 'protected $listen'
-php artisan event:generate
-
-use Event;
-use App\Events\EventClassName;
-
-Event::fire(new EventClassName($model, $user));
-// or we can use helper
-event(new EventClassName($model, $user));

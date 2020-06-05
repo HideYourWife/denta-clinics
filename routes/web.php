@@ -13,16 +13,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Auth::routes(['register' => false]);
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::group(['middleware' => ['auth', 'admin']], function () {
-    Route::get('/index', function () {
-        return view('admin.index');
+/*--  Admin side  --*/
+Route::group(['middleware' => ['status', 'auth']], function (){
+    $groupData = [
+      'namespace' => 'Admin',
+      'prefix' => 'admin',
+    ];
+
+    Route::group($groupData, function (){
+        Route::resource('index', 'MainController')
+            ->names('admin.index');
     });
 });

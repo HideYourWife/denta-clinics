@@ -45,24 +45,20 @@ class User extends Authenticatable
 
     public function isAdministrator()
     {
-        return $this->roles()->where('name', 'administrators')->exists();
+        return $this->roles()->where('name', 'admin')->exists();
     }
 
     public function isUser()
     {
         $user = $this->roles()->where('name', 'user')->exists();
-        if ($user) return 'user';
-    }
-
-    public function isDisabled()
-    {
-        $disabled = $this->roles()->where('name', 'disabled')->exists();
-        if ($disabled) return 'disabled';
+        if ($user) return true;
+        return false;
     }
 
     public function isVisitor()
     {
         $visitor = !Auth::check();
-        if ($visitor) return 'visitor';
+        if ($visitor) return true;
+        return false;
     }
 }
